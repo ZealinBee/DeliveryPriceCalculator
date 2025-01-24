@@ -71,6 +71,24 @@ function formatPriceToCents(price: number) {
   return price * 100;
 }
 
+interface Range {
+  min: number;
+  max: number;
+  a: number;
+  b: number;
+  flag?: unknown;
+}
+
+function findRangeIndex(distance: number, ranges: Range[]): number {
+  let rangeIndex = 0;
+  ranges.forEach((range, index) => {
+    if (distance >= range.min && distance <= range.max) {
+      rangeIndex = index;
+    }
+  });
+  return rangeIndex;
+}
+
 function App() {
   const {
     register,
@@ -98,6 +116,7 @@ function App() {
       const distanceRanges = [];
       let venueLatitude = 0;
       let venueLongitude = 0;
+      let deliveryFee = 0;
 
       const dynamicResponse = await axios.get(
         `https://consumer-api.development.dev.woltapi.com/home-assignment-api/v1/venues/${formData.venueSlug}/dynamic`
@@ -141,16 +160,20 @@ function App() {
           longitude: venueLongitude,
         }
       );
-
-      console.log("deliveryDistance", deliveryDistance);
-      console.log("smallOrderSurcharge", smallOrderSurcharge);
-
+      const rangeIndex = findRangeIndex(deliveryDistance, distanceRanges);
+      deliveryFee =
+        basePrice +
+        distanceRanges[rangeIndex].a +
+        (distanceRanges[rangeIndex].b * deliveryDistance) / 10;
       setPriceBreakdown({
         cartValue: formatPriceToCents(formData.cartValue),
-        deliveryFee: 0,
+        deliveryFee: deliveryFee,
         deliveryDistance: deliveryDistance,
         smallOrderSurcharge: smallOrderSurcharge,
-        totalPrice: 0,
+        totalPrice:
+          formatPriceToCents(formData.cartValue) +
+          deliveryFee +
+          smallOrderSurcharge,
       });
     } catch (error) {
       console.error(error);
@@ -160,31 +183,29 @@ function App() {
     }
   };
 
-  const onGetLocation = async () => {
-    try {
-      const formData = getValues();
-      const response = await axios.get(
-        `https://consumer-api.development.dev.woltapi.com/home-assignment-api/v1/venues/${formData.venueSlug}/static`
+  const onGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        getLocationSuccess,
+        getLocationError
       );
-      const location = coordinatesSchema.safeParse(response.data);
-      if (!location.success) {
-        // if there is an api JSON format change, apologize to the user THEN track the error and IMMEDIATELY notify the developers with something like trackApiError, telling that hey you changed the shape of the API, tell us first next time
-      } else if (location.success) {
-        setValue(
-          "userLatitude",
-          location.data.venue_raw.location.coordinates[1]
-        );
-        setValue(
-          "userLongitude",
-          location.data.venue_raw.location.coordinates[0]
-        );
-      }
-    } catch (error) {
-      console.error(error);
-      setError("venueSlug", {
-        message: `Venue slug not found. try "home-assignment-venue-helsinki"`,
-      });
+    } else {
+      alert(
+        "Geolocation is not supported by this browser. Please enter your location manually or try another browser."
+      );
     }
+  };
+
+  const getLocationSuccess = (position: GeolocationPosition) => {
+    const { latitude, longitude } = position.coords;
+    setValue("userLatitude", latitude);
+    setValue("userLongitude", longitude);
+  };
+
+  const getLocationError = (error: GeolocationPositionError) => {
+    alert(
+      "Error occurred while getting your location. Please enter your location manually."
+    );
   };
 
   return (
@@ -219,7 +240,7 @@ function App() {
         />
         {errors.userLongitude && <p>{errors.userLongitude.message}</p>}
         <button type="button" onClick={onGetLocation}>
-          Get Location
+          Get Your Location
         </button>
         {errors.venueSlug && <p>{errors.venueSlug.message}</p>}
         <button type="submit">Calculate Delivery Price</button>
@@ -236,7 +257,9 @@ function App() {
         </p>
         <p>
           Delivery Fee{" "}
-          <span data-raw-value="">{priceBreakdown.deliveryFee} </span>
+          <span data-raw-value={priceBreakdown.deliveryFee}>
+            {(priceBreakdown.deliveryFee / 100).toFixed(2)} €
+          </span>
         </p>
         <p>
           Delivery Distance{" "}
@@ -251,7 +274,10 @@ function App() {
           </span>
         </p>
         <p>
-          Total Price <span data-raw-value="">{priceBreakdown.totalPrice}</span>
+          Total Price{" "}
+          <span data-raw-value="">
+            {(priceBreakdown.totalPrice / 100).toFixed(2)} €
+          </span>
         </p>
       </div>
     </>
