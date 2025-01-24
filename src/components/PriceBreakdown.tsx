@@ -1,3 +1,5 @@
+import { formatCentToDecimals } from "../utils/formatCentToDecimalsUtil";
+
 interface PriceBreakdownProps {
   priceBreakdown: {
     cartValue: number;
@@ -15,13 +17,13 @@ function PriceBreakdown({ priceBreakdown }: PriceBreakdownProps) {
       <p>
         Cart Value{" "}
         <span data-raw-value={priceBreakdown.cartValue}>
-          {(priceBreakdown.cartValue / 100).toFixed(2)} €
+          {formatCentToDecimals(priceBreakdown.cartValue)} €
         </span>
       </p>
       <p>
         Delivery Fee{" "}
         <span data-raw-value={priceBreakdown.deliveryFee}>
-          {(priceBreakdown.deliveryFee / 100).toFixed(2)} €
+          {formatCentToDecimals(priceBreakdown.deliveryFee)} €
         </span>
       </p>
       <p>
@@ -33,13 +35,13 @@ function PriceBreakdown({ priceBreakdown }: PriceBreakdownProps) {
       <p>
         Small order surcharge{" "}
         <span data-raw-value={priceBreakdown.smallOrderSurcharge}>
-          {(priceBreakdown.smallOrderSurcharge / 100).toFixed(2)} €
+          {formatCentToDecimals(priceBreakdown.smallOrderSurcharge)} €
         </span>
       </p>
       <p>
         Total Price{" "}
-        <span data-raw-value="">
-          {(priceBreakdown.totalPrice / 100).toFixed(2)} €
+        <span data-raw-value={priceBreakdown.totalPrice}>
+          {formatCentToDecimals(priceBreakdown.totalPrice)} €
         </span>
       </p>
     </div>

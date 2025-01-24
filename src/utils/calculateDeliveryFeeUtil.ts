@@ -1,12 +1,20 @@
-import { DeliveryRange } from "../interfaces/DeliveryRange"
+import { MaxDistanceExceededError } from "../errors/MaxDistanceExceededError";
+import { DeliveryRange } from "../interfaces/DeliveryRange";
 
-export const calculateDeliveryFee = (deliveryDistance: number, basePrice: number, distanceRanges: DeliveryRange[]): number => {
-    const deliveryRange = distanceRanges.find(range => deliveryDistance >= range.min && deliveryDistance <= range.max);
+export const calculateDeliveryFee = (
+  deliveryDistance: number,
+  basePrice: number,
+  deliveryRanges: DeliveryRange[]
+): number => {
+  const deliveryRange = deliveryRanges.find(
+    (range) => deliveryDistance >= range.min && deliveryDistance <= range.max
+  );
 
+  if (!deliveryRange) {
+    throw new MaxDistanceExceededError();
+  }
 
-    if (!deliveryRange) {
-        throw new Error('Distance is out of range');
-    }
-
-    return basePrice + deliveryRange.a + (deliveryRange.b * deliveryDistance) / 10;
-}
+  return (
+    basePrice + deliveryRange.a + (deliveryRange.b * deliveryDistance) / 10
+  );
+};

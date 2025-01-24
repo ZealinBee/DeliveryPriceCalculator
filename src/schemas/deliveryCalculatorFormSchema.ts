@@ -7,7 +7,7 @@ export const deliveryCalculatorFormSchema = z.object({
       invalid_type_error: "Cart value must be a number, i.e. 42.42",
     })
     .nonnegative("Cart value must be a positive number")
-    .min(0, "Cart value must not be empty"),
+    .min(0.1, "Cart value must be greater than 0"),
   userLatitude: z.coerce
     .number({
       invalid_type_error: "User latitude must be a number, i.e. 41.303921",
