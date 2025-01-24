@@ -2,6 +2,7 @@ import { useState } from "react";
 import { set, z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
+import { getDistance } from "geolib";
 
 import "./App.css";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -92,36 +93,62 @@ function App() {
 
   const onSubmit: SubmitHandler<FormFields> = async (formData) => {
     try {
-      const response = await axios.get(
-        `https://consumer-api.development.dev.woltapi.com/home-assignment-api/v1/venues/${formData.venueSlug}/dynamic`
-      );
-      const result = orderCalculationSchema.safeParse(response.data);
       let orderMinimumNoSurcharge = 0;
       let basePrice = 0;
       const distanceRanges = [];
-      if (!result.success) {
+      let venueLatitude = 0;
+      let venueLongitude = 0;
+
+      const dynamicResponse = await axios.get(
+        `https://consumer-api.development.dev.woltapi.com/home-assignment-api/v1/venues/${formData.venueSlug}/dynamic`
+      );
+      const staticResponse = await axios.get(
+        `https://consumer-api.development.dev.woltapi.com/home-assignment-api/v1/venues/${formData.venueSlug}/static`
+      );
+      const venueLocation = coordinatesSchema.safeParse(staticResponse.data);
+      const orderCalcuationNumbers = orderCalculationSchema.safeParse(
+        dynamicResponse.data
+      );
+      if (!orderCalcuationNumbers.success || !venueLocation.success) {
         // if there is an api JSON format change, apologize to the user THEN track the error and IMMEDIATELY notify the developers with something like trackApiError, telling that hey you changed the shape of the API, tell us first next time
       } else {
         orderMinimumNoSurcharge =
-          result.data.venue_raw.delivery_specs.order_minimum_no_surcharge;
+          orderCalcuationNumbers.data.venue_raw.delivery_specs
+            .order_minimum_no_surcharge;
         basePrice =
-          result.data.venue_raw.delivery_specs.delivery_pricing.base_price;
+          orderCalcuationNumbers.data.venue_raw.delivery_specs.delivery_pricing
+            .base_price;
         distanceRanges.push(
-          ...result.data.venue_raw.delivery_specs.delivery_pricing
-            .distance_ranges
+          ...orderCalcuationNumbers.data.venue_raw.delivery_specs
+            .delivery_pricing.distance_ranges
         );
+        venueLatitude = venueLocation.data.venue_raw.location.coordinates[1];
+        venueLongitude = venueLocation.data.venue_raw.location.coordinates[0];
       }
       let smallOrderSurcharge = 0;
       if (formatPriceToCents(formData.cartValue) < orderMinimumNoSurcharge) {
         smallOrderSurcharge =
           orderMinimumNoSurcharge - formatPriceToCents(formData.cartValue);
       }
+
+      const deliveryDistance = getDistance(
+        {
+          latitude: formData.userLatitude,
+          longitude: formData.userLongitude,
+        },
+        {
+          latitude: venueLatitude,
+          longitude: venueLongitude,
+        }
+      );
+
+      console.log("deliveryDistance", deliveryDistance);
       console.log("smallOrderSurcharge", smallOrderSurcharge);
 
       setPriceBreakdown({
         cartValue: formatPriceToCents(formData.cartValue),
         deliveryFee: 0,
-        deliveryDistance: 0,
+        deliveryDistance: deliveryDistance,
         smallOrderSurcharge: smallOrderSurcharge,
         totalPrice: 0,
       });
@@ -213,7 +240,9 @@ function App() {
         </p>
         <p>
           Delivery Distance{" "}
-          <span data-raw-value="">{priceBreakdown.deliveryDistance}</span>
+          <span data-raw-value={priceBreakdown.deliveryDistance}>
+            {priceBreakdown.deliveryDistance} meters
+          </span>
         </p>
         <p>
           Small order surcharge{" "}
