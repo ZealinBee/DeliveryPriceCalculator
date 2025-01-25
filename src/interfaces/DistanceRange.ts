@@ -1,4 +1,4 @@
-export interface DistanceRanges {
+export interface DistanceRange {
   min: number;
   max: number;
   a: number;

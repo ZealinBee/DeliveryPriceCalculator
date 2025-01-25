@@ -45,7 +45,7 @@ function DeliveryCalculatorForm({
     try {
       const venueData = await fetchVenueData(formData.venueSlug);
       if (!venueData) {
-        throw new VenueNotFoundError("Venue not found");
+        throw new VenueNotFoundError("Venue not found, try another venue slug like home-assignment-venue-helsinki");
       }
 
       const {
@@ -88,15 +88,16 @@ function DeliveryCalculatorForm({
     } catch (error) {
       if (error instanceof VenueNotFoundError) {
         setError("venueSlug", {
-          message:
-            "Venue not found, try another venue slug like home-assignment-venue-helsinki",
+          message: error.message,
         });
       }
       if (error instanceof MaxDistanceExceededError) {
         setError("userLongitude", {
-          message:
-            "Max distance exceeded(2km), try 60.18 24.92(with helsinki slug)",
+          message: error.message,
         });
+        setError("userLatitude", {
+          message: error.message,
+        })
       }
     }
   };

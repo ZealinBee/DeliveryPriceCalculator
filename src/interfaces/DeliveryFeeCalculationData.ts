@@ -1,4 +1,4 @@
-import { DistanceRanges } from "./DistanceRanges";
+import { DistanceRange } from "./DistanceRange";
 
 export interface DeliveryFeeCalculationData {
   venue_raw: {
@@ -6,7 +6,7 @@ export interface DeliveryFeeCalculationData {
       order_minimum_no_surcharge: number;
       delivery_pricing: {
         base_price: number;
-        distance_ranges: DistanceRanges[];
+        distance_ranges: DistanceRange[];
       };
     };
   };

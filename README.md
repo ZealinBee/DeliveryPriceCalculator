@@ -25,6 +25,10 @@ Available on
 - Minimal Animation
 - Responsive
 
+## UI
+
+TO BE PLACED LATER
+
 ## Libraries used
 
 - Zod and React Hook Form for the ease of form validation
