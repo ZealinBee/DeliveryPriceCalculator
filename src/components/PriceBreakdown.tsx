@@ -12,18 +12,18 @@ interface PriceBreakdownProps {
 
 function PriceBreakdown({ priceBreakdown }: PriceBreakdownProps) {
   return (
-    <div>
+    <div className="price-breakdown">
       <h2>Price Breakdown</h2>
       <p>
         Cart Value{" "}
         <span data-raw-value={priceBreakdown.cartValue}>
-          {formatCentToDecimals(priceBreakdown.cartValue)} €
+          €{formatCentToDecimals(priceBreakdown.cartValue)}
         </span>
       </p>
       <p>
         Delivery Fee{" "}
         <span data-raw-value={priceBreakdown.deliveryFee}>
-          {formatCentToDecimals(priceBreakdown.deliveryFee)} €
+          €{formatCentToDecimals(priceBreakdown.deliveryFee)}
         </span>
       </p>
       <p>
@@ -33,15 +33,15 @@ function PriceBreakdown({ priceBreakdown }: PriceBreakdownProps) {
         </span>
       </p>
       <p>
-        Small order surcharge{" "}
+        Small Order Surcharge{" "}
         <span data-raw-value={priceBreakdown.smallOrderSurcharge}>
-          {formatCentToDecimals(priceBreakdown.smallOrderSurcharge)} €
+          €{formatCentToDecimals(priceBreakdown.smallOrderSurcharge)}
         </span>
       </p>
       <p>
         Total Price{" "}
         <span data-raw-value={priceBreakdown.totalPrice}>
-          {formatCentToDecimals(priceBreakdown.totalPrice)} €
+          €{formatCentToDecimals(priceBreakdown.totalPrice)}
         </span>
       </p>
     </div>

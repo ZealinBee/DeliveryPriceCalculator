@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import "./App.css";
+import "./styles/main.scss";
 import PriceBreakdown from "./components/PriceBreakdown";
 import DeliveryCalculatorForm from "./components/DeliveryCalculatorForm";
 
@@ -15,14 +15,14 @@ function App() {
   const [showPriceBreakdown, setShowPriceBreakdown] = useState(false);
 
   return (
-    <>
-      <h1>Ultimate Delivery Order Price Calculator</h1>
+    <div className="app">
+      <h1>Delivery Order Price Calculator</h1>
       <DeliveryCalculatorForm
         setPriceBreakdown={setPriceBreakdown}
         setShowPriceBreakdown={setShowPriceBreakdown}
       />
       {showPriceBreakdown && <PriceBreakdown priceBreakdown={priceBreakdown} />}
-    </>
+    </div>
   );
 }
 

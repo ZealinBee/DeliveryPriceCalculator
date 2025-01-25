@@ -1,0 +1,22 @@
+@use "./delivery_calculator_form.scss";
+@use "./price_break_down.scss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", serif;
+}
+
+h1 {
+  text-align: center;
+  margin-top:1rem;
+  font-size:1.75rem;
+  font-weight:900;
+}
+
+.app {
+  @media(min-width: 768px) {
+    margin: 0 30vw;
+  }
+}

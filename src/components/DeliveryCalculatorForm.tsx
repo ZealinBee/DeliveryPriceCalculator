@@ -31,7 +31,6 @@ function DeliveryCalculatorForm({
   setPriceBreakdown,
   setShowPriceBreakdown,
 }: DeliveryCalculatorFormProps) {
-
   const {
     register,
     handleSubmit,
@@ -96,7 +95,7 @@ function DeliveryCalculatorForm({
       if (error instanceof MaxDistanceExceededError) {
         setError("userLongitude", {
           message:
-            "Max distance exceeded, try another location that is within 2km, try 60.18012143 24.92813512(helsinki slug)",
+            "Max distance exceeded(2km), try 60.18 24.92(with helsinki slug)",
         });
       }
     }
@@ -128,36 +127,63 @@ function DeliveryCalculatorForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="delivery-calculator-form"
+    >
+      <label htmlFor="venue-slug-input">Venue Slug</label>
       <input
         {...register("venueSlug")}
-        placeholder="Venue Slug"
+        placeholder="home-assignment-venue-helsinki"
         required
         data-test-id="venueSlug"
+        id="venue-slug-input"
+        className={errors.venueSlug ? "error" : ""}
       />
-      {errors.venueSlug && <p>{errors.venueSlug.message}</p>}
+      {errors.venueSlug && (
+        <p className="error-message">{errors.venueSlug.message}</p>
+      )}
+      <label htmlFor="cart-value-input">Cart Value</label>
       <input
         {...register("cartValue")}
-        placeholder="Cart Value"
+        placeholder="12.34"
         required
         data-test-id="cartValue"
+        id="cart-value-input"
+        className={errors.cartValue ? "error" : ""}
       />
-      {errors.cartValue && <p>{errors.cartValue.message}</p>}
+      {errors.cartValue && (
+        <p className="error-message">{errors.cartValue.message}</p>
+      )}
+      <label htmlFor="user-latitude-input">Your Latitude</label>
       <input
         {...register("userLatitude")}
-        placeholder="Your Latitude"
+        placeholder="60.17012143"
         required
         data-test-id="userLatitude"
+        id="user-latitude-input"
+        className={errors.userLatitude ? "error" : ""}
       />
-      {errors.userLatitude && <p>{errors.userLatitude.message}</p>}
+      {errors.userLatitude && (
+        <p className="error-message">{errors.userLatitude.message}</p>
+      )}
+      <label htmlFor="user-longitude-input">Your Longitude</label>
       <input
         {...register("userLongitude")}
-        placeholder="Your Longitude"
+        placeholder="24.92813512"
         required
         data-test-id="userLongitude"
+        id="user-longitude-input"
+        className={errors.userLongitude ? "error" : ""}
       />
-      {errors.userLongitude && <p>{errors.userLongitude.message}</p>}
-      <button type="button" onClick={onGetLocation}>
+      {errors.userLongitude && (
+        <p className="error-message">{errors.userLongitude.message}</p>
+      )}
+      <button
+        type="button"
+        onClick={onGetLocation}
+        className="get-location-button"
+      >
         Get Your Location
       </button>
       <button type="submit">Calculate Delivery Price</button>
