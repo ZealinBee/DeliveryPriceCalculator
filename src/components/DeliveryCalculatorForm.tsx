@@ -1,7 +1,8 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AxiosError } from "axios";
+
+import { fetchVenueData } from "../api/fetchVenueData";
 
 import { deliveryCalculatorFormSchema } from "../schemas/deliveryCalculatorFormSchema";
 
@@ -9,8 +10,9 @@ import { calculateSmallOrderSurcharge } from "../utils/calculateSmallOrderSurcha
 import { getDistance } from "geolib";
 import { calculateDeliveryFee } from "../utils/calculateDeliveryFeeUtil";
 import { formatPriceToCents } from "../utils/formatPriceToCentsUtil";
+
 import { MaxDistanceExceededError } from "../errors/MaxDistanceExceededError";
-import { fetchVenueData } from "../api/fetchVenueData";
+import { VenueNotFoundError } from "../errors/VenueNotFoundError";
 
 type FormFields = z.infer<typeof deliveryCalculatorFormSchema>;
 
@@ -29,6 +31,7 @@ function DeliveryCalculatorForm({
   setPriceBreakdown,
   setShowPriceBreakdown,
 }: DeliveryCalculatorFormProps) {
+
   const {
     register,
     handleSubmit,
@@ -41,18 +44,20 @@ function DeliveryCalculatorForm({
 
   const onSubmit: SubmitHandler<FormFields> = async (formData) => {
     try {
+      const venueData = await fetchVenueData(formData.venueSlug);
+      if (!venueData) {
+        throw new VenueNotFoundError("Venue not found");
+      }
+
+      const {
+        venueLatitude,
+        venueLongitude,
+        orderMinimumNoSurcharge,
+        basePrice,
+        deliveryRanges,
+      } = venueData;
       const cartValueInCents = formatPriceToCents(formData.cartValue);
 
-      const venueData = await fetchVenueData(formData.venueSlug);
-      if(!venueData) {
-        throw new Error("Venue data not found");
-      }
-      const { venueLatitude, venueLongitude, orderMinimumNoSurcharge, basePrice, deliveryRanges } = venueData;
-
-      const smallOrderSurcharge = calculateSmallOrderSurcharge(
-        cartValueInCents,
-        orderMinimumNoSurcharge
-      );
       const deliveryDistance = getDistance(
         {
           latitude: formData.userLatitude,
@@ -68,6 +73,10 @@ function DeliveryCalculatorForm({
         basePrice,
         deliveryRanges
       );
+      const smallOrderSurcharge = calculateSmallOrderSurcharge(
+        cartValueInCents,
+        orderMinimumNoSurcharge
+      );
 
       setPriceBreakdown({
         cartValue: cartValueInCents,
@@ -78,15 +87,16 @@ function DeliveryCalculatorForm({
       });
       setShowPriceBreakdown(true);
     } catch (error) {
-      console.error(error);
-      if (error as AxiosError) {
+      if (error instanceof VenueNotFoundError) {
         setError("venueSlug", {
-          message: `Venue slug not found. try "home-assignment-venue-helsinki.`,
+          message:
+            "Venue not found, try another venue slug like home-assignment-venue-helsinki",
         });
       }
       if (error instanceof MaxDistanceExceededError) {
-        setError("userLatitude", {
-          message: error.message,
+        setError("userLongitude", {
+          message:
+            "Max distance exceeded, try another location that is within 2km, try 60.18012143 24.92813512(helsinki slug)",
         });
       }
     }
@@ -121,27 +131,28 @@ function DeliveryCalculatorForm({
     <form onSubmit={handleSubmit(onSubmit)}>
       <input
         {...register("venueSlug")}
-        placeholder="venue slug"
+        placeholder="Venue Slug"
         required
         data-test-id="venueSlug"
       />
+      {errors.venueSlug && <p>{errors.venueSlug.message}</p>}
       <input
         {...register("cartValue")}
-        placeholder="cart value"
+        placeholder="Cart Value"
         required
         data-test-id="cartValue"
       />
       {errors.cartValue && <p>{errors.cartValue.message}</p>}
       <input
         {...register("userLatitude")}
-        placeholder="user latitude"
+        placeholder="Your Latitude"
         required
         data-test-id="userLatitude"
       />
       {errors.userLatitude && <p>{errors.userLatitude.message}</p>}
       <input
         {...register("userLongitude")}
-        placeholder="user longitude"
+        placeholder="Your Longitude"
         required
         data-test-id="userLongitude"
       />
@@ -149,7 +160,6 @@ function DeliveryCalculatorForm({
       <button type="button" onClick={onGetLocation}>
         Get Your Location
       </button>
-      {errors.venueSlug && <p>{errors.venueSlug.message}</p>}
       <button type="submit">Calculate Delivery Price</button>
       <div>{isSubmitting && <p>Calculating...</p>}</div>
     </form>

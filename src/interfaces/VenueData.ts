@@ -1,9 +1,9 @@
-import { DeliveryRange } from "./DeliveryRange";
+import { DistanceRanges } from "./DistanceRanges";
 
-export default interface VenueData {
+export interface VenueData {
   venueLatitude: number;
   venueLongitude: number;
   orderMinimumNoSurcharge: number;
   basePrice: number;
-  deliveryRanges: DeliveryRange[];
+  deliveryRanges: DistanceRanges[];
 }
