@@ -1,6 +1,6 @@
 import {expect, test } from "vitest";
 
-import { formatPriceToCents } from "./formatPriceToCents";
+import { formatPriceToCents } from "../../utils/formatPriceToCents";
 
 test("formats price to cents successfully", () => {
   const result = formatPriceToCents(10.12);

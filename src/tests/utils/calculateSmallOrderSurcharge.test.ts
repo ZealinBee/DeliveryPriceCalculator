@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { calculateSmallOrderSurcharge } from "./calculateSmallOrderSurcharge";
+import { calculateSmallOrderSurcharge } from "../../utils/calculateSmallOrderSurcharge";
 
 test("calculates small order surcharge successfully when order is below 1000 cents", () => {
   const cartValueInCents = 900;

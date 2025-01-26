@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 
-import { calculateDeliveryFee } from "./calculateDeliveryFee";
-import { MaxDistanceExceededError } from "../errors/MaxDistanceExceededError";
+import { calculateDeliveryFee } from "../../utils/calculateDeliveryFee";
+import { MaxDistanceExceededError } from "../../errors/MaxDistanceExceededError";
 
 const deliveryRanges = [
   {

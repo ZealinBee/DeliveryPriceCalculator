@@ -1,8 +1,9 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import { VenueData } from "../interfaces/VenueData";
 import { CoordinateData } from "../interfaces/CoordinateData";
 import { DeliveryFeeCalculationData } from "../interfaces/DeliveryFeeCalculationData";
+import { ApiError } from "../errors/ApiError";
 
 export const fetchVenueData = async (
   venueSlug: string
@@ -32,6 +33,10 @@ export const fetchVenueData = async (
           .delivery_pricing.distance_ranges,
     };
   } catch (error) {
-    console.error(error);
+    if (error instanceof AxiosError) {
+      if (error.code === "ERR_NETWORK") {
+        throw new ApiError("Network error, please try again later.");
+      }
+    }
   }
 };

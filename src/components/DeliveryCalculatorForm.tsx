@@ -13,6 +13,7 @@ import { formatPriceToCents } from "../utils/formatPriceToCents";
 
 import { MaxDistanceExceededError } from "../errors/MaxDistanceExceededError";
 import { VenueNotFoundError } from "../errors/VenueNotFoundError";
+import { ApiError } from "../errors/ApiError";
 
 type FormFields = z.infer<typeof deliveryCalculatorFormSchema>;
 
@@ -88,6 +89,12 @@ function DeliveryCalculatorForm({
       });
       setShowPriceBreakdown(true);
     } catch (error) {
+      setShowPriceBreakdown(false);
+      if(error instanceof ApiError) {
+        setError("venueSlug", {
+          message: error.message,
+        });
+      }
       if (error instanceof VenueNotFoundError) {
         setError("venueSlug", {
           message: error.message,
@@ -133,6 +140,7 @@ function DeliveryCalculatorForm({
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="delivery-calculator-form"
+      data-testid="form"
     >
       <label htmlFor="venue-slug-input">Venue Slug</label>
       <input
@@ -190,10 +198,11 @@ function DeliveryCalculatorForm({
         type="button"
         onClick={onGetLocation}
         className="get-location-button"
+        data-test-id="getLocation"
       >
         Get Your Location
       </button>
-      <button type="submit">Calculate Delivery Price</button>
+      <button type="submit" data-test-id="calculateDeliveryPrice">Calculate Delivery Price</button>
       <div aria-live="polite">{isSubmitting && <p>Calculating...</p>}</div>
     </form>
   );
