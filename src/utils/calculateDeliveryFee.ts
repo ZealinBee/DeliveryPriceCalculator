@@ -13,7 +13,7 @@ export const calculateDeliveryFee = (
   if (!deliveryRange) {
     const maxDistance = deliveryRanges[deliveryRanges.length - 1].min;
     throw new MaxDistanceExceededError(
-      `Max distance exceeded for this venue (${maxDistance}m), try 60.18 24.92(with home-assignment-venue-helsinki as venue slug)`
+      `Your distance is too far from this venue (over ${maxDistance}m), please try another venue.`
     );
   }
 
