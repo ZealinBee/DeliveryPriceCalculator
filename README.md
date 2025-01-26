@@ -22,7 +22,6 @@
 - Validate user input thoroughly
 - Provide detailed error message to user
 - Unit Testing for utility functions
-- Testing for form validation
 - Accessibility
 - Minimal Animation
 - Responsive
