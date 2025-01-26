@@ -9,15 +9,23 @@
   }
   input {
     padding: 0.5rem 0.75rem;
-    border: 2px solid #e6e6e6;
+    border: 2px solid #e6e6e6d7;
     border-radius: 0.5rem;
     &:hover {
       border: 2px solid #009de0;
     }
+    &:focus {
+      border: 2px solid #009de0;
+      outline:none
+    }
+    transition: border 0.2s linear;
   }
 
   input.error {
     border: 2px solid red;
+    &:focus {
+      border: 2px solid #009de0;
+    }
   }
 
   button {
@@ -33,6 +41,8 @@
     &:hover {
       box-shadow: 0 0 3px black;
     }
+
+
   }
 
   .get-location-button {

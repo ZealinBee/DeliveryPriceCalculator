@@ -1,4 +1,4 @@
-import { formatCentToDecimals } from "../utils/formatCentToDecimalsUtil";
+import { formatCentToDecimals } from "../utils/formatCentToDecimals";
 
 interface PriceBreakdownProps {
   priceBreakdown: {
@@ -12,7 +12,7 @@ interface PriceBreakdownProps {
 
 function PriceBreakdown({ priceBreakdown }: PriceBreakdownProps) {
   return (
-    <div className="price-breakdown">
+    <div className="price-breakdown" aria-live="polite">
       <h2>Price Breakdown</h2>
       <p>
         Cart Value{" "}
@@ -38,7 +38,7 @@ function PriceBreakdown({ priceBreakdown }: PriceBreakdownProps) {
           €{formatCentToDecimals(priceBreakdown.smallOrderSurcharge)}
         </span>
       </p>
-      <p>
+      <p className="total-price">
         Total Price{" "}
         <span data-raw-value={priceBreakdown.totalPrice}>
           €{formatCentToDecimals(priceBreakdown.totalPrice)}

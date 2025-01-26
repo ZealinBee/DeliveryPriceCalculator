@@ -15,14 +15,14 @@ function App() {
   const [showPriceBreakdown, setShowPriceBreakdown] = useState(false);
 
   return (
-    <div className="app">
+    <main className="app">
       <h1>Delivery Order Price Calculator</h1>
       <DeliveryCalculatorForm
         setPriceBreakdown={setPriceBreakdown}
         setShowPriceBreakdown={setShowPriceBreakdown}
       />
       {showPriceBreakdown && <PriceBreakdown priceBreakdown={priceBreakdown} />}
-    </div>
+    </main>
   );
 }
 

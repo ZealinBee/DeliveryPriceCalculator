@@ -12,7 +12,7 @@ Available on
 
 ## How to Use After Running
 
-1. Enter the input field for venue name and cart value (Use home-assignment-venue-helsinki in this case)
+1. Enter the input field for venue slug and cart value (Use home-assignment-venue-helsinki in this case, other slugs would work too but just this)
 2. Press the "Get Your Location", ensure you allow location for this website (or just enter location manually)
 3. Press Calculate Delivery Price
 

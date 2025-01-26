@@ -6,10 +6,10 @@ import { fetchVenueData } from "../api/fetchVenueData";
 
 import { deliveryCalculatorFormSchema } from "../schemas/deliveryCalculatorFormSchema";
 
-import { calculateSmallOrderSurcharge } from "../utils/calculateSmallOrderSurchargeUtil";
+import { calculateSmallOrderSurcharge } from "../utils/calculateSmallOrderSurcharge";
 import { getDistance } from "geolib";
-import { calculateDeliveryFee } from "../utils/calculateDeliveryFeeUtil";
-import { formatPriceToCents } from "../utils/formatPriceToCentsUtil";
+import { calculateDeliveryFee } from "../utils/calculateDeliveryFee";
+import { formatPriceToCents } from "../utils/formatPriceToCents";
 
 import { MaxDistanceExceededError } from "../errors/MaxDistanceExceededError";
 import { VenueNotFoundError } from "../errors/VenueNotFoundError";
@@ -45,7 +45,9 @@ function DeliveryCalculatorForm({
     try {
       const venueData = await fetchVenueData(formData.venueSlug);
       if (!venueData) {
-        throw new VenueNotFoundError("Venue not found, try another venue slug like home-assignment-venue-helsinki");
+        throw new VenueNotFoundError(
+          "Venue not found, are you sure the slug you entered was correct?"
+        );
       }
 
       const {
@@ -97,7 +99,7 @@ function DeliveryCalculatorForm({
         });
         setError("userLatitude", {
           message: error.message,
-        })
+        });
       }
     }
   };
@@ -140,6 +142,7 @@ function DeliveryCalculatorForm({
         data-test-id="venueSlug"
         id="venue-slug-input"
         className={errors.venueSlug ? "error" : ""}
+        aria-describedby={errors.venueSlug ? "venue-slug-error" : ""}
       />
       {errors.venueSlug && (
         <p className="error-message">{errors.venueSlug.message}</p>
@@ -152,6 +155,7 @@ function DeliveryCalculatorForm({
         data-test-id="cartValue"
         id="cart-value-input"
         className={errors.cartValue ? "error" : ""}
+        aria-describedby={errors.cartValue ? "cart-value-error" : ""}
       />
       {errors.cartValue && (
         <p className="error-message">{errors.cartValue.message}</p>
@@ -159,11 +163,12 @@ function DeliveryCalculatorForm({
       <label htmlFor="user-latitude-input">Your Latitude</label>
       <input
         {...register("userLatitude")}
-        placeholder="60.17012143"
+        placeholder="60.17"
         required
         data-test-id="userLatitude"
         id="user-latitude-input"
         className={errors.userLatitude ? "error" : ""}
+        aria-describedby={errors.userLatitude ? "user-latitude-error" : ""}
       />
       {errors.userLatitude && (
         <p className="error-message">{errors.userLatitude.message}</p>
@@ -171,11 +176,12 @@ function DeliveryCalculatorForm({
       <label htmlFor="user-longitude-input">Your Longitude</label>
       <input
         {...register("userLongitude")}
-        placeholder="24.92813512"
+        placeholder="24.93"
         required
         data-test-id="userLongitude"
         id="user-longitude-input"
         className={errors.userLongitude ? "error" : ""}
+        aria-describedby={errors.userLongitude ? "user-longitude-error" : ""}
       />
       {errors.userLongitude && (
         <p className="error-message">{errors.userLongitude.message}</p>
@@ -188,7 +194,7 @@ function DeliveryCalculatorForm({
         Get Your Location
       </button>
       <button type="submit">Calculate Delivery Price</button>
-      <div>{isSubmitting && <p>Calculating...</p>}</div>
+      <div aria-live="polite">{isSubmitting && <p>Calculating...</p>}</div>
     </form>
   );
 }
